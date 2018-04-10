@@ -94,18 +94,17 @@ dependencies {
   compile("org.wildfly.swarm:logging")
   compile("org.wildfly.swarm:ejb")
   testCompile("org.wildfly.swarm:arquillian")
-  compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
-  compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
-  providedCompile "javax:javaee-api:$javaeeVersion"
-  compile "org.slf4j:slf4j-api:$slf4jVersion"
-  compile "org.slf4j:slf4j-jdk14:$slf4jVersion"
-  compile "io.vavr:vavr:$vavrVersion"
+  compile("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion")
+  providedCompile("javax:javaee-api:$javaeeVersion")
+  compile("org.slf4j:slf4j-api:$slf4jVersion")
+  compile("org.slf4j:slf4j-jdk14:$slf4jVersion")
+  compile("io.vavr:vavr:$vavrVersion")
   compileOnly("org.projectlombok:lombok:$lombokVersion")
 }
 
 dependencyManagement {
   imports {
-    mavenBom "org.wildfly.swarm:bom:$wildflySwarmVersion"
+    mavenBom("org.wildfly.swarm:bom:$wildflySwarmVersion")
   }
 }
 

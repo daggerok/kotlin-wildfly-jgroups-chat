@@ -4,7 +4,6 @@ RUN apk --no-cache --update add busybox-suid bash curl unzip sudo openssh-client
  && adduser -h /home/appuser -s /bin/bash -D -u 1025 appuser wheel \
  && echo "appuser ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers \
  && sed -i "s/.*requiretty$/Defaults !requiretty/" /etc/sudoers \
- && sysctl -w net.core.rmem_max=26214400 \
  && wget --no-cookies \
          --no-check-certificate \
          --header "Cookie: oraclelicense=accept-securebackup-cookie" \
@@ -29,7 +28,7 @@ ENTRYPOINT ${JAVA_OPTS} java -XshowSettings:vm \
                              -jar ./app.jar
 CMD /bin/bash
 EXPOSE 8080
-HEALTHCHECK --timeout=1s \
-            --retries=35 \
+HEALTHCHECK --timeout=2s \
+            --retries=22 \
             CMD curl -f http://127.0.0.1:8080/ || exit 1
 COPY --chown=appuser ./target/*-swarm.jar ./app.jar

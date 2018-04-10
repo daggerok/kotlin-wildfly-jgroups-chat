@@ -11,36 +11,41 @@ jdk: oraclejdk8
 install: true
 before_script:
 - sudo apt update -y >/dev/null 2>&1 || true
-- sudo apt install -y --no-install-recommends curl jq libxml2-utils docker-ce python-pip >/dev/null 2>&1
+- sudo apt install -y --no-install-recommends curl docker-ce python-pip >/dev/null 2>&1
 - sudo pip install docker-compose httpie >/dev/null 2>&1
 - source <(curl -s https://raw.githubusercontent.com/daggerok/bash-functions/master/main.bash)
 - stop_any 8080 8081 8082 80
 
 script:
 
-- bash gradlew clean build composeUp >/dev/null
-- docker logs -f kotlinwildflyjgroupschat_node-2_1 &
-- docker logs -f kotlinwildflyjgroupschat_node-1_1 &
+- bash gradlew >/dev/null || true
+- bash gradlew composeUp -i
+- wait_for 8081 8082
+- docker logs -f wildfly-swarm-jgroups-chat_node-1_1 &
+- docker logs -f wildfly-swarm-jgroups-chat_node-2_1 &
 - http :8081 message=hello,
 - http :8082 message=world!
 - bash gradlew composeDown >/dev/null
 - stop_any 8081 8082 8080 80
 
-- bash mvnw >/dev/null
-- bash gradlew composeUp -x assemble -Pprofile=maven >/dev/null
-- docker logs -f kotlinwildflyjgroupschat_node-2_1 &
-- docker logs -f kotlinwildflyjgroupschat_node-1_1 &
+- bash mvnw clean package com.dkanejs.maven.plugins:docker-compose-maven-plugin:1.0.1:up
+- wait_for 8081 8082
+- docker ps
+- docker logs -f wildfly-swarm-jgroups-chat_node-1_1 &
+- docker logs -f wildfly-swarm-jgroups-chat_node-2_1 &
+- sleep 60
 - http :8081 message=hello,
 - http :8082 message=world!
-- bash gradlew composeDown -Pprofile=maven >/dev/null
+- bash mvnw com.dkanejs.maven.plugins:docker-compose-maven-plugin:1.0.1:down
 - stop_any 8081 8082 8080 80
 
-- bash mvnw clean install >/dev/null
+- bash mvnw >/dev/null || true
 - docker-compose -f docker-compose-gradle.yaml build
 - docker-compose -f docker-compose-gradle.yaml up &
 - wait_for 8081 8082
-- docker logs -f kotlinwildflyjgroupschat_node-2_1 &
-- docker logs -f kotlinwildflyjgroupschat_node-1_1 &
+- docker ps
+- docker logs -f wildfly-swarm-jgroups-chat_node-1_1 &
+- docker logs -f wildfly-swarm-jgroups-chat_node-2_1 &
 - sleep 60
 - http :8081 message=hello,
 - http :8082 message=world!

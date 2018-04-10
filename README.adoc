@@ -1,4 +1,4 @@
-= jgroups-chat image:https://travis-ci.org/daggerok/kotlin-wildfly-jgroups-chat.svg?branch=master["Build Status", link="https://travis-ci.org/daggerok/kotlin-wildfly-jgroups-chat"]
+= jgroups-chat image:https://travis-ci.org/daggerok/wildfly-swarm-jgroups-chat.svg?branch=master["Build Status", link="https://travis-ci.org/daggerok/wildfly-swarm-jgroups-chat"]
 
 TODO: replace java JGroups functionality with Kotlin extension functions
 
