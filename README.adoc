@@ -1,4 +1,4 @@
-= jgroups-chat
+= jgroups-chat image:https://travis-ci.org/daggerok/kotlin-wildfly-jgroups-chat.svg?branch=master["Build Status", link="https://travis-ci.org/daggerok/kotlin-wildfly-jgroups-chat"]
 
 //tag::content[]
 Wildfly Swarm | JGroups Chat
