@@ -1,0 +1,152 @@
+buildscript {
+  ext {
+    javaVersion = "1.8"
+    javaeeVersion = "8.0"
+    vavrVersion = "0.9.2"
+    slf4jVersion = "1.7.25"
+    kotlinVersion = "1.2.31"
+    lombokVersion = "1.16.20"
+    wildflySwarmVersion = "2018.4.1"
+  }
+  repositories {
+    mavenLocal()
+    mavenCentral()
+  }
+  dependencies {
+    classpath("org.wildfly.swarm:wildfly-swarm-gradle-plugin:$wildflySwarmVersion")
+  }
+}
+
+plugins {
+  //id "ear"
+  id "war"
+  id "idea"
+  id "maven"
+  id "eclipse"
+  id "org.jetbrains.kotlin.jvm" version "1.2.31"
+  id "org.jetbrains.kotlin.plugin.noarg" version "1.2.31"
+  id "org.jetbrains.kotlin.plugin.allopen" version "1.2.31"
+  id "org.jetbrains.kotlin.plugin.spring" version "1.2.31"
+  id "io.spring.dependency-management" version "1.0.5.RELEASE"
+  id "com.avast.gradle.docker-compose" version "0.6.13"
+}
+
+apply plugin: "wildfly-swarm"
+
+group = "daggerok"
+version = "0.0.1"
+sourceCompatibility = targetCompatibility = "$javaVersion"
+
+compileKotlin {
+  incremental = true
+  kotlinOptions {
+    freeCompilerArgs = ["-Xjsr305=strict"]
+    jvmTarget = "$javaVersion"
+  }
+}
+
+compileTestKotlin {
+  incremental = true
+  kotlinOptions {
+    freeCompilerArgs = ["-Xjsr305=strict"]
+    jvmTarget = "$javaVersion"
+  }
+}
+
+allOpen {
+  annotation("javax.ws.rs.Path")
+  annotation("javax.ejb.Startup")
+  annotation("javax.ejb.Stateless")
+  annotation("javax.ejb.Singleton")
+  annotation("javax.inject.Singleton")
+  annotation("javax.persistence.Entity")
+  annotation("javax.enterprise.context.ApplicationScoped")
+}
+
+noArg {
+  annotation("javax.ws.rs.Path")
+  annotation("javax.ejb.Startup")
+  annotation("javax.ejb.Stateless")
+  annotation("javax.ejb.Singleton")
+  annotation("javax.inject.Singleton")
+  annotation("javax.persistence.Entity")
+  annotation("javax.enterprise.context.ApplicationScoped")
+}
+
+/*
+ear {
+  archiveName = "${project.name}.ear"
+}
+*/
+
+war {
+  archiveName = "${project.name}.war"
+}
+
+repositories {
+  mavenLocal()
+  mavenCentral()
+}
+
+dependencies {
+  compile("org.jgroups:jgroups:4.0.11.Final")
+  compile("org.wildfly.swarm:microprofile")
+  compile("org.wildfly.swarm:logging")
+  compile("org.wildfly.swarm:ejb")
+  testCompile("org.wildfly.swarm:arquillian")
+  compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinVersion"
+  compile "org.jetbrains.kotlin:kotlin-reflect:$kotlinVersion"
+  providedCompile "javax:javaee-api:$javaeeVersion"
+  compile "org.slf4j:slf4j-api:$slf4jVersion"
+  compile "org.slf4j:slf4j-jdk14:$slf4jVersion"
+  compile "io.vavr:vavr:$vavrVersion"
+  compileOnly("org.projectlombok:lombok:$lombokVersion")
+}
+
+dependencyManagement {
+  imports {
+    mavenBom "org.wildfly.swarm:bom:$wildflySwarmVersion"
+  }
+}
+
+swarm {
+  executable = true
+}
+
+def profile = project.hasProperty("profile") ? project.getProperty("profile") : "gradle"
+
+dockerCompose {
+  useComposeFiles = [project.file("docker-compose-${profile}.yaml")]
+  // captureContainersOutput = true
+  captureContainersOutput = false
+  stopContainers = true
+  removeContainers = true
+  removeImages = "Local"
+  removeVolumes = true
+  removeOrphans = true
+  forceRecreate = true
+  waitForTcpPorts = false
+  projectName = project.name
+}
+
+composeUp.dependsOn assemble
+compileJava.dependsOn(processResources)
+assemble.dependsOn "wildfly-swarm-package"
+defaultTasks "clean", "wildfly-swarm-package"
+
+task wrapper(type: Wrapper) {
+  gradleVersion = "4.6"
+  distributionType = "ALL"
+}
+
+idea {
+  module {
+    downloadSources = true
+  }
+}
+
+eclipse {
+  classpath {
+    downloadSources = true
+  }
+}
