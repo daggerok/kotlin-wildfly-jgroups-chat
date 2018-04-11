@@ -30,7 +30,6 @@ script:
 
 - bash mvnw clean package com.dkanejs.maven.plugins:docker-compose-maven-plugin:1.0.1:up
 - wait_for 8081 8082
-- docker ps
 - docker logs -f wildfly-swarm-jgroups-chat_node-1_1 &
 - docker logs -f wildfly-swarm-jgroups-chat_node-2_1 &
 - sleep 60
@@ -43,7 +42,6 @@ script:
 - docker-compose -f docker-compose-gradle.yaml build
 - docker-compose -f docker-compose-gradle.yaml up &
 - wait_for 8081 8082
-- docker ps
 - docker logs -f wildfly-swarm-jgroups-chat_node-1_1 &
 - docker logs -f wildfly-swarm-jgroups-chat_node-2_1 &
 - sleep 60
